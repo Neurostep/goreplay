@@ -32,7 +32,7 @@ type GrpcOutputConfig struct {
 	Timeout       time.Duration `json:"output-http-timeout"`
 	WorkerTimeout time.Duration `json:"output-http-worker-timeout"`
 	ImportPath    string        `json:"output-grpc-import-path"`
-	ProtoPaths    []string      `json:"output-grpc-proto-path"`
+	ProtoPaths    ProtoPaths    `json:"output-grpc-proto-path"`
 	address       string
 }
 

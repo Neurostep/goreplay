@@ -150,6 +150,10 @@ func NewPlugins() *InOutPlugins {
 		plugins.registerPlugin(NewHTTPOutput, options, &Settings.OutputHTTPConfig)
 	}
 
+	for _, options := range Settings.OutputGrpc {
+		plugins.registerPlugin(NewGrpcOutput, options, &Settings.OutputGrpcConfig)
+	}
+
 	for _, options := range Settings.OutputBinary {
 		plugins.registerPlugin(NewBinaryOutput, options, &Settings.OutputBinaryConfig)
 	}

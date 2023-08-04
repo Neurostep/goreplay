@@ -86,6 +86,10 @@ type AppSettings struct {
 	OutputWebSocketConfig WebSocketOutputConfig
 	OutputWebSocketStats  bool `json:"output-ws-stats"`
 
+	OutputGrpc       []string `json:"output-grpc"`
+	OutputGrpcConfig GrpcOutputConfig
+	OutputGrpcStats  bool `json:"output-grpc-stats"`
+
 	InputFile          []string      `json:"input-file"`
 	InputFileLoop      bool          `json:"input-file-loop"`
 	InputFileReadDepth int           `json:"input-file-read-depth"`
@@ -223,6 +227,20 @@ func init() {
 	flag.BoolVar(&Settings.OutputHTTPConfig.OriginalHost, "http-original-host", false, "Normally gor replaces the Host http header with the host supplied with --output-http.  This option disables that behavior, preserving the original Host header.")
 	flag.StringVar(&Settings.OutputHTTPConfig.ElasticSearch, "output-http-elasticsearch", "", "Send request and response stats to ElasticSearch:\n\tgor --input-raw :8080 --output-http staging.com --output-http-elasticsearch 'es_host:api_port/index_name'")
 	/* outputHTTPConfig */
+
+	flag.Var(&MultiOption{&Settings.OutputGrpc}, "output-grpc", "Forwards incoming requests to given gRPC address.\n\t# Redirect all incoming requests to staging.com address \n\tgor --input-raw :80 --output-grpc http://staging.com")
+
+	/* outputGRPCConfig */
+	flag.IntVar(&Settings.OutputGrpcConfig.WorkersMin, "output-grpc-workers-min", 0, "Gor uses dynamic worker scaling. Enter a number to set a minimum number of workers. default = 1.")
+	flag.IntVar(&Settings.OutputGrpcConfig.WorkersMax, "output-grpc-workers", 0, "Gor uses dynamic worker scaling. Enter a number to set a maximum number of workers. default = 0 = unlimited.")
+	flag.IntVar(&Settings.OutputGrpcConfig.QueueLen, "output-grpc-queue-len", 1000, "Number of requests that can be queued for output, if all workers are busy. default = 1000")
+	flag.DurationVar(&Settings.OutputGrpcConfig.WorkerTimeout, "output-grpc-worker-timeout", 2*time.Second, "Duration to rollback idle workers.")
+
+	flag.DurationVar(&Settings.OutputGrpcConfig.Timeout, "output-grpc-timeout", 5*time.Second, "Specify gRPC request/response timeout. By default 5s. Example: --output-grpc-timeout 30s")
+
+	flag.StringVar(&Settings.OutputGrpcConfig.ImportPath, "output-grpc-import-path", "", "Import path for proto files. \n\tgor --input-raw :8080 --output-grpc staging.com --output-grpc-import-path /path/to/proto")
+	flag.Var(&Settings.OutputGrpcConfig.ProtoPaths, "output-grpc-proto-path", "List of proto files. \n\tgor --input-raw :8080 --output-grpc staging.com --output-grpc-proto-path one.proto --output-grpc-proto-path two.proto")
+	/* outputGRPCConfig */
 
 	flag.Var(&MultiOption{&Settings.OutputBinary}, "output-binary", "Forwards incoming binary payloads to given address.\n\t# Redirect all incoming requests to staging.com address \n\tgor --input-raw :80 --input-raw-protocol binary --output-binary staging.com:80")
 
